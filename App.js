@@ -1,58 +1,91 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, TextInput, SafeAreaView, FlatList, listExpression, renderItem } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, SafeAreaView, FlatList, listExpression, renderItem, Tab } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { TouchableOpacity } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 export default function App() {
+    //Use state pour step 1
+    const [character1, setCharacter1] = useState(null);
     const [character, setCharacter] = useState(null);
+
+    const [quote1, setQuote1] = useState(null);
     const [quote, setQuote] = useState(null);
-    const [icon, setIcon] = useState(null);
+
     const [input, setInput] = useState("");
-    const [listQuote, setlistQuote] = useState(null);
 
-    const ItemSaisir = (data) => (
-        <View>
-            <View style={styles.containerGlobal}>
-                <Image
-                    style={styles.image}
-                    source={{uri: data.icon}}/>
-                <View>
-                    <Text style={styles.text}>{data.character}</Text>
-                    <Text style={styles.text}>{data.quote}</Text>
-                </View>
-            </View>
-        </View>
-    );
+    const [icon1, setIcon1] = useState(null);
 
-    const renderItem = ({item}) => (
-        <TouchableOpacity><ItemSaisir data={item} /></TouchableOpacity>
-    );
+    const [icon, setIcon] = useState(null);
 
+    const Tab = createBottomTabNavigator();
 
-    const getNomSimpson = () => {
-        return fetch('https://thesimpsonsquoteapi.glitch.me/quotes?character=' + input)
+    const getSimpSon = () => {
+        return fetch('https://thesimpsonsquoteapi.glitch.me/quotes')
             .then((response) => response.json())
-            .then((json) => {
-                setCharacter('Nom: ' + json[0].character)
-                setQuote('Citation: ' + json[0].quote)
-                setIcon(json[0].image)
-                console.log(input)
-                console.log(json[0].character)
-                return json.name
+            .then((data) => {
+
+                setCharacter('Nom: ' + data[0].character)
+                setQuote('Citation: ' + data[0].quote)
+                setIcon(data[0].image)
             })
             .catch((error) => {
                 console.error(error);
             });
-    }
+    };
 
+
+    function Random() {
+
+        const Item = () => (
+            <View>
+                <View style={styles.containerGlobal}>
+                    <Image
+                        style={styles.image}
+                        source={{uri: icon}}/>
+                    <View>
+                        <Text style={styles.text}>{character}</Text>
+                        <Text style={styles.text}>{quote}</Text>
+                    </View>
+                </View>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => getSimpSon()}>
+                    <Text style={styles.textButton}>Reload</Text>
+                </TouchableOpacity>
+            </View>
+        );
+        return (
+            <View style={styles.carte}>
+                <Item></Item>
+            </View>
+
+        );
+    }
 
     useEffect(() => {
         (async () => {
-            // getNomChar();
+            getSimpSon();
         })();
     }, []);
 
-    return (
+
+    function Recherche() {
+        const getNomSimpson = () => {
+            return fetch('https://thesimpsonsquoteapi.glitch.me/quotes?character=' + input)
+                .then((response) => response.json())
+                .then((json) => {
+                    setCharacter1('Nom: ' + json[0].character)
+                    setQuote1('Citation: ' + json[0].quote)
+                    setIcon1(json[0].image)
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+
+        return(
         <View style={styles.container}>
             <View style={styles.recherche}>
                 <TextInput style={styles.input} placeholder="Entrez un nom" onChangeText={item => setInput(item)} clearButtonMode/>
@@ -74,15 +107,33 @@ export default function App() {
                 <View style={styles.carte2}>
                     <Image
                         style={styles.tinyLogo}
-                        source={{uri: icon}}
+                        source={{uri: icon1}}
                     />
                     <View style={styles.textcarte}>
-                        <Text style={styles.text2}>{character}</Text>
-                        <Text style={styles.text2}>{quote}</Text>
+                        <Text style={styles.text2}>{character1}</Text>
+                        <Text style={styles.text2}>{quote1}</Text>
                     </View>
                 </View>
             </View>
         </View>
+    );
+    }
+
+
+
+    useEffect(() => {
+        (async () => {
+
+        })();
+    }, []);
+
+    return (
+        <NavigationContainer>
+            <Tab.Navigator>
+                <Tab.Screen name="Random" component={Random} />
+                <Tab.Screen name="Recherche" component={Recherche} />
+            </Tab.Navigator>
+        </NavigationContainer>
     );
 }
 
@@ -92,6 +143,39 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    containerGlobal:{
+        backgroundColor:'#DAF7A6',
+        padding:20,
+        borderRadius:15,
+    },
+    containerFlatList:{
+        backgroundColor:'#DAF7A6',
+        borderRadius:15,
+        padding:25,
+    },
+    button:{
+        padding: 10,
+        backgroundColor: 'orange',
+        marginVertical:10,
+        borderRadius: 10,
+    },
+    image: {
+        width: 106,
+        height: 200,
+    }, imageExpression: {
+        width: 90,
+        height: 120,
+    },
+    text:{
+        fontSize:21,
+    },
+    textFlatList:{
+        fontSize:12,
+    },
+    textButton:{
+        fontSize:21,
+        textAlign:'center',
     },
     separator: {
         paddingBottom: 20
@@ -115,16 +199,6 @@ const styles = StyleSheet.create({
     },
     samelesbrise: {
         alignItems: "center"
-    },
-    button: {
-        padding: 10,
-        width: 80,
-        backgroundColor: 'orange',
-        marginVertical:10,
-        borderRadius: 10,
-        borderWidth: 2,
-        alignItems: "center",
-        alignContent: "center"
     },
     button2: {
         margin: 15,
@@ -160,5 +234,4 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
         paddingTop: 10
     }
-
 });
