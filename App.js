@@ -59,7 +59,7 @@ export default function App() {
             });
     };
     const getSimpSonExpression = () => {
-        return fetch('https://thesimpsonsquoteapi.glitch.me/quotes?count='+number)
+        return fetch('https://thesimpsonsquoteapi.glitch.me/quotes?count='+nomSimpson)
             .then((response) => response.json())
             .then((data) => {
                 setListeExpression(data)
@@ -163,7 +163,6 @@ export default function App() {
             <SafeAreaView style={styles.container}>
                 <FlatList data={listExpression} renderItem={renderItem}/>
             </SafeAreaView>
-            <ItemStep3></ItemStep3>
         </SafeAreaView>
     );
 }
